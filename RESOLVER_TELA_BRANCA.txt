@@ -1,0 +1,324 @@
+================================================================================
+                  SOLUÇÃO: TELA BRANCA NO NETLIFY
+================================================================================
+
+PROBLEMA:
+  Site abre no navegador mas a página fica em branco (sem conteúdo)
+
+CAUSA:
+  Geralmente é erro de variáveis de ambiente ou erro de build
+
+================================================================================
+PASSO 1: VERIFICAR CONSOLE DO NAVEGADOR
+================================================================================
+
+1. Abra seu site no Netlify (ex: seu-site.netlify.app)
+2. Pressione F12 (abre DevTools)
+3. Clique na aba "Console"
+4. Veja se aparecem erros em VERMELHO
+
+Se vir erros, anote-os e procure por:
+  • "VITE_SUPABASE_URL"
+  • "VITE_SUPABASE_ANON_KEY"
+  • "undefined"
+  • "cannot read property"
+
+PRÓXIMO PASSO:
+  Se vir erro sobre variáveis → Ir para "PASSO 2"
+  Se vir outro erro → Ir para "PASSO 3"
+  Se não vir erro → Ir para "PASSO 4"
+
+================================================================================
+PASSO 2: VERIFICAR VARIÁVEIS NO NETLIFY
+================================================================================
+
+IMPORTANTE! As variáveis de ambiente podem não estar configuradas:
+
+1. Acesse seu painel Netlify:
+   → https://app.netlify.com
+   → Clique no seu site (portal-autopecas)
+
+2. Vá para "Site settings"
+   → Painel esquerdo → "Build & deploy"
+   → Clique em "Environment"
+
+3. Você deve ver:
+   ✅ VITE_SUPABASE_URL = https://seu-projeto.supabase.co
+   ✅ VITE_SUPABASE_ANON_KEY = sua_chave_aqui
+
+4. Se as variáveis NÃO estão lá:
+   
+   ADICIONE AGORA:
+   
+   a) Clique "Edit variables"
+   
+   b) Clique "Add a variable"
+   
+   c) Preencha:
+      Key: VITE_SUPABASE_URL
+      Value: https://seu-projeto.supabase.co
+   
+   d) Clique "Save"
+   
+   e) Clique "Add a variable" novamente
+   
+   f) Preencha:
+      Key: VITE_SUPABASE_ANON_KEY
+      Value: sua_chave_publica_aqui
+   
+   g) Clique "Save"
+
+5. Depois de adicionar as variáveis, você PRECISA fazer novo deploy:
+   
+   → Vá para "Deploys"
+   → Clique "Trigger deploy"
+   → Aguarde 2-3 minutos
+   
+   Seu site deve voltar ao normal! ✅
+
+================================================================================
+PASSO 3: VERIFICAR SE O BUILD TEM ERRO
+================================================================================
+
+1. Vá para "Deploys" no Netlify
+
+2. Clique no último deploy (o mais recente)
+
+3. Clique em "Deploy log"
+
+4. Procure por:
+   ❌ "error" em VERMELHO
+   ❌ "failed"
+   ❌ "Cannot find module"
+
+Se encontrar erro, você precisa:
+
+   a) Abra seu projeto localmente:
+      $ cd C:\Users\Administrator\Downloads\plataformas\portal-autopeças
+   
+   b) Tente fazer build:
+      $ npm run build
+   
+   c) Se der erro, veja qual é e procure solução
+   
+   d) Depois faça commit e push:
+      $ git add .
+      $ git commit -m "Fix: Corrigir erro de build"
+      $ git push
+   
+   e) Netlify fará novo deploy automaticamente
+
+================================================================================
+PASSO 4: VERIFICAR _redirects
+================================================================================
+
+Para SPA (Single Page Application), você precisa de redirecionamento.
+
+Verifique se o arquivo existe:
+  public/_redirects
+
+Conteúdo esperado:
+  /* /index.html 200
+
+Se o arquivo não existir, CRIE AGORA:
+
+1. Na pasta do projeto, vá para:
+   C:\Users\Administrator\Downloads\plataformas\portal-autopeças\public\
+
+2. Crie um arquivo chamado "_redirects" (sem extensão)
+
+3. Cole EXATAMENTE isto:
+   /* /index.html 200
+
+4. Salve o arquivo
+
+5. Faça commit e push:
+   $ git add .
+   $ git commit -m "Add: _redirects para SPA routing"
+   $ git push
+
+6. Aguarde novo deploy automático (2-3 minutos)
+
+Seu site deve funcionar agora! ✅
+
+================================================================================
+PASSO 5: VERIFICAR SUPABASE AUTH URL
+================================================================================
+
+Se conseguiu passar pela tela branca mas não consegue fazer login:
+
+1. Vá para Supabase Dashboard:
+   → https://app.supabase.io
+
+2. Clique no seu projeto
+
+3. Vá para "Authentication"
+
+4. Clique em "URL Configuration"
+
+5. Verifique "Site URL":
+   Deve ser seu domínio do Netlify, ex:
+   https://seu-site-aleatorio.netlify.app
+
+6. Se não tiver, adicione agora:
+   → Clique "Add a redirect URL"
+   → Cole seu domínio do Netlify
+   → Clique "Save"
+
+7. Também adicione como "Redirect URL":
+   https://seu-site-aleatorio.netlify.app/
+
+Agora o login deve funcionar! ✅
+
+================================================================================
+SOLUÇÃO RÁPIDA (FAÇA ISSO AGORA)
+================================================================================
+
+Se a página está em branco, faça EXATAMENTE ISTO na ordem:
+
+1. Verifique o console (F12 → Console)
+   Viu erro sobre variáveis?
+
+2. Se SIM:
+   → Vá para Netlify
+   → Site settings → Build & deploy → Environment
+   → Adicione:
+      VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+      VITE_SUPABASE_ANON_KEY=sua_chave_aqui
+   → Clique "Trigger deploy"
+   → Aguarde 2-3 minutos
+   → Recarregue a página (F5)
+
+3. Se ainda não funcionar:
+   → Verifique arquivo public/_redirects existe
+   → Se não, crie com conteúdo: /* /index.html 200
+   → Faça git push
+   → Aguarde deploy
+
+4. Se AINDA não funcionar:
+   → Limpe cache: F12 → Application → Clear storage
+   → Recarregue (F5)
+   → Se nada funcionar, abra NOVO ABA (Ctrl+T) e teste
+
+================================================================================
+TESTE PASSO A PASSO
+================================================================================
+
+1. VARIÁVEIS NO NETLIFY:
+   [ ] Verifique VITE_SUPABASE_URL
+   [ ] Verifique VITE_SUPABASE_ANON_KEY
+   [ ] Faça novo deploy
+   [ ] Aguarde 2-3 minutos
+
+2. ARQUIVO _redirects:
+   [ ] Verifique se existe em public/_redirects
+   [ ] Se não existe, crie
+   [ ] Faça git push
+   [ ] Aguarde deploy
+
+3. SUPABASE AUTH URL:
+   [ ] Vá para Supabase
+   [ ] Authentication → URL Configuration
+   [ ] Adicione seu domínio Netlify
+
+4. TESTE:
+   [ ] Abra seu site no Netlify
+   [ ] Pressione F5 (recarregue)
+   [ ] Se branco ainda, pressione F12 e veja console
+   [ ] Procure por erros em VERMELHO
+
+================================================================================
+CHECKLIST DE DEPLOYMENT
+================================================================================
+
+Antes de considerar o site "ok":
+
+[ ] Página carrega (não fica branca)
+[ ] Consegue fazer login
+[ ] Dashboard mostra fornecedores
+[ ] Consegue buscar por nome
+[ ] Consegue adicionar favoritos
+[ ] Modal abre ao clicar no card
+[ ] Consegue fazer logout
+[ ] Página é responsiva no mobile (F12 → Toggle Device)
+
+Se TUDO está marcado, seu site está funcionando! ✅
+
+================================================================================
+DÚVIDAS COMUNS
+================================================================================
+
+P: "Eu não vejo VITE_SUPABASE_URL no Netlify, onde fico"
+R: Site settings → Build & deploy → Environment → Edit variables
+
+P: "Adicionei as variáveis mas nada mudou"
+R: Você precisa fazer novo deploy!
+   Vá para "Deploys" → "Trigger deploy" → Aguarde 2-3 minutos
+
+P: "Ainda está branco depois de tudo"
+R: Abra F12 → Console e procure por erros
+   Anote exatamente qual é o erro
+   Se for sobre Supabase, verifique as credenciais
+
+P: "Funcionava localmente mas não no Netlify"
+R: 99% é problema de variáveis de ambiente
+   Verifique se estão iguais em .env.local e em Netlify
+
+P: "Consigo ver o site mas não consigo fazer login"
+R: Falta adicionar URL no Supabase Auth URL Configuration
+   Vá para Supabase → Authentication → URL Configuration
+
+================================================================================
+ÚLTIMA DICA: LIMPAR CACHE
+================================================================================
+
+Se já fez tudo mas ainda não funciona:
+
+1. Abra seu site (ex: seu-site.netlify.app)
+
+2. Pressione F12 (DevTools)
+
+3. Clique "Application"
+
+4. Clique "Storage"
+
+5. Clique "Clear site data"
+
+6. Recarregue a página (F5)
+
+7. Pronto! Cache foi limpo
+
+Seu site deve funcionar agora! 🎉
+
+================================================================================
+CONTATO & SUPORTE
+================================================================================
+
+Se mesmo após tudo isso não funcionar:
+
+1. Verifique Deploy Log no Netlify (Deploys → Deploy log)
+   Procure por "error" em VERMELHO
+   Anote exatamente qual é o erro
+
+2. Verifique Console no navegador (F12 → Console)
+   Procure por "error" em VERMELHO
+   Anote exatamente qual é o erro
+
+3. Verifique se Supabase está acessível:
+   Tente fazer login localmente (npm run dev)
+   Funciona localmente mas não no Netlify?
+   → Problema é variáveis de ambiente
+
+4. Se tudo funciona localmente mas não no Netlify:
+   Copie as variáveis de .env.local
+   Adicione EXATAMENTE no Netlify
+   Faça novo deploy
+
+================================================================================
+
+Versão: 1.0.0
+Status: ✅ PRONTO
+
+Feito com ❤️
+
+================================================================================
