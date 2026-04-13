@@ -1,0 +1,65 @@
+# Configuração de Deploy - Netlify
+# https://docs.netlify.com/configure-builds/file-conventions/
+
+[build]
+  # Comando para compilar a aplicação
+  command = "npm run build"
+  
+  # Diretório que contém os arquivos a fazer deploy
+  publish = "dist"
+  
+  # Diretório para funções (se usar Netlify Functions)
+  # functions = "netlify/functions"
+
+# Configuração de Redirects (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de Segurança
+[[headers]]
+  for = "/*"
+  
+  [headers.values]
+    # Previne MIME-type sniffing
+    X-Content-Type-Options = "nosniff"
+    
+    # Protege contra clickjacking
+    X-Frame-Options = "SAMEORIGIN"
+    
+    # Protege contra XSS (deprecado mas ainda útil)
+    X-XSS-Protection = "1; mode=block"
+    
+    # Política de Referrer
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Permite compartilhamento de recursos (CORS)
+    Access-Control-Allow-Origin = "*"
+
+# Cache para assets estáticos
+[[headers]]
+  for = "/assets/*"
+  
+  [headers.values]
+    # Cache de 1 ano para assets com hash
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache para o HTML (sem cache)
+[[headers]]
+  for = "/*.html"
+  
+  [headers.values]
+    # Sempre revalidar o HTML
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Variáveis de Ambiente (referência)
+# Estas devem ser configuradas no painel do Netlify
+# [context.production]
+#   environment = { VITE_SUPABASE_URL = "...", VITE_SUPABASE_ANON_KEY = "..." }
+
+# [context.deploy-preview]
+#   environment = { VITE_SUPABASE_URL = "...", VITE_SUPABASE_ANON_KEY = "..." }
+
+# [context.branch-deploy]
+#   environment = { VITE_SUPABASE_URL = "...", VITE_SUPABASE_ANON_KEY = "..." }

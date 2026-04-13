@@ -1,0 +1,143 @@
+/**
+ * Estilos do SupplierCard
+ */
+
+.supplier-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efeito hover - elevação do card */
+.supplier-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
+}
+
+.supplier-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.supplier-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* Header do Card */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.supplier-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background-color: var(--lighter);
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.supplier-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Botão de Favorito */
+.favorite-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  color: var(--gray-400);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favorite-btn:hover {
+  color: var(--warning);
+  transform: scale(1.1);
+}
+
+.favorite-btn.active {
+  color: var(--warning);
+}
+
+.favorite-btn.active svg {
+  fill: currentColor;
+}
+
+/* Conteúdo */
+.card-content {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.supplier-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.supplier-description {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer */
+.card-footer {
+  margin-top: auto;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .supplier-card {
+    padding: 1.25rem;
+  }
+
+  .supplier-name {
+    font-size: 1rem;
+  }
+
+  .supplier-description {
+    font-size: 0.8rem;
+  }
+}

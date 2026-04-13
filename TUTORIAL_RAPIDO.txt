@@ -1,0 +1,436 @@
+================================================================================
+                    TUTORIAL RÁPIDO - PORTAL AUTOPEÇAS
+                     React + Vite + Supabase + Netlify
+================================================================================
+
+📍 ÍNDICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. INSTALAÇÃO (3 minutos)
+2. CONFIGURAÇÃO SUPABASE (10 minutos)
+3. RODAR LOCALMENTE (2 minutos)
+4. USAR O SISTEMA (5 minutos)
+5. DEPLOY NETLIFY (15 minutos)
+6. SOLUÇÃO DE PROBLEMAS (consulta rápida)
+
+================================================================================
+1. INSTALAÇÃO (3 MINUTOS)
+================================================================================
+
+PASSO 1: Abra o terminal na pasta do projeto
+  $ cd C:\Users\Administrator\Downloads\plataformas\portal-autopeças
+
+PASSO 2: Instale as dependências
+  $ npm install
+  
+  (Aguarde 2-3 minutos. Vai baixar ~600MB)
+
+PRONTO! ✅
+
+================================================================================
+2. CONFIGURAÇÃO SUPABASE (10 MINUTOS)
+================================================================================
+
+PASSO 1: Crie uma conta no Supabase (GRATUITA)
+  → Vá para: https://supabase.com
+  → Clique "Sign Up"
+  → Use sua conta Google/GitHub
+  → Crie um novo projeto (escolha uma região)
+
+PASSO 2: Obtenha suas credenciais
+  → No painel do Supabase, clique "Settings" (ícone de engrenagem)
+  → Vá para "API"
+  → Copie:
+      • Project URL → exemplo: https://seu-projeto.supabase.co
+      • Anon public key → exemplo: eyJhbGciOiJIUzI1N...
+
+PASSO 3: Crie arquivo .env.local
+  → Na pasta do projeto, crie um arquivo chamado ".env.local"
+  → Cole o conteúdo:
+
+      VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+      VITE_SUPABASE_ANON_KEY=sua_chave_publica_aqui
+
+  → Salve o arquivo
+
+PASSO 4: Crie as tabelas no banco
+  → Vá para "SQL Editor" no painel do Supabase
+  → Clique "New Query"
+  → Cole este código (TODO DE UMA VEZ):
+
+---INÍCIO DO CÓDIGO SQL---
+
+-- Tabela fornecedores
+CREATE TABLE fornecedores (
+  id BIGSERIAL PRIMARY KEY,
+  nome VARCHAR(255) NOT NULL,
+  descricao TEXT NOT NULL,
+  url VARCHAR(500) NOT NULL,
+  instrucoes TEXT NOT NULL,
+  logo_url VARCHAR(500),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabela favoritos
+CREATE TABLE favoritos (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  fornecedor_id BIGINT NOT NULL REFERENCES fornecedores(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, fornecedor_id)
+);
+
+-- Índices
+CREATE INDEX idx_fornecedores_nome ON fornecedores(nome);
+CREATE INDEX idx_favoritos_user_id ON favoritos(user_id);
+
+-- RLS (Segurança)
+ALTER TABLE fornecedores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE favoritos ENABLE ROW LEVEL SECURITY;
+
+-- Política fornecedores: qualquer autenticado vê
+CREATE POLICY "Fornecedores visíveis para autenticados"
+ON fornecedores FOR SELECT TO authenticated USING (true);
+
+-- Política favoritos: apenas o usuário vê seus dados
+CREATE POLICY "Favoritos apenas do usuário"
+ON favoritos FOR SELECT TO authenticated USING (auth.uid() = user_id);
+
+CREATE POLICY "Inserir próprios favoritos"
+ON favoritos FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Deletar próprios favoritos"
+ON favoritos FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- Inserir fornecedores de exemplo
+INSERT INTO fornecedores (nome, descricao, url, instrucoes, logo_url)
+VALUES 
+  (
+    'Rufato',
+    'Distribuidor de autopeças B2B com amplo catálogo',
+    'https://www.b2brufato.com.br/Rufato_B2B/PAGE_Login/0J8AAKiX4QHDAg',
+    'Login via email e senha',
+    NULL
+  ),
+  (
+    'CHG Automotiva',
+    'Loja B2B especializada em peças automotivas',
+    'https://loja.chg.com.br/entrada',
+    'Login via CNPJ e senha',
+    NULL
+  );
+
+---FIM DO CÓDIGO SQL---
+
+  → Clique "Run" (ou Ctrl+Enter)
+  → Pronto! Tabelas criadas ✅
+
+PASSO 5: Habilite autenticação por Email
+  → No painel Supabase, vá para "Authentication"
+  → Clique "Providers"
+  → Procure "Email" e certifique que está ativado (verde)
+  → Pronto! ✅
+
+================================================================================
+3. RODAR LOCALMENTE (2 MINUTOS)
+================================================================================
+
+PASSO 1: Abra o terminal
+  $ cd C:\Users\Administrator\Downloads\plataformas\portal-autopeças
+
+PASSO 2: Inicie o servidor
+  $ npm run dev
+
+PASSO 3: Acesse no navegador
+  → Abra: http://localhost:5173
+  → Você deve ver a página de login
+
+PRONTO! ✅
+
+================================================================================
+4. USAR O SISTEMA (5 MINUTOS)
+================================================================================
+
+A. CRIAR CONTA
+  1. Na página de login, clique "Não tem conta? Cadastre-se"
+  2. Digite um email: teste@exemplo.com
+  3. Digite uma senha: minhasenha123
+  4. Clique "Criar Conta"
+  5. Você será redirecionado para o login
+  
+B. FAZER LOGIN
+  1. Na página de login, digite:
+     - Email: teste@exemplo.com
+     - Senha: minhasenha123
+  2. Clique "Entrar"
+  3. Você será redirecionado ao Dashboard ✅
+
+C. USAR O DASHBOARD
+  1. Você verá 2 fornecedores (Rufato e CHG Automotiva)
+  2. Cada fornecedor é um "card" com:
+     - Nome
+     - Descrição
+     - Botão ❤️ (Favoritar)
+     - Botão "Acessar Fornecedor"
+
+D. BUSCAR FORNECEDOR
+  1. Na barra de busca no topo, digite: "Rufato"
+  2. Os fornecedores são filtrados em tempo real
+  3. Para limpar, apague o texto
+
+E. ADICIONAR AOS FAVORITOS
+  1. Clique no ❤️ cinza de um fornecedor
+  2. O coração fica vermelho ❤️
+  3. O fornecedor é salvo no banco de dados
+  4. Ao recarregar a página, ele ainda está marcado
+
+F. VER DETALHES DO FORNECEDOR
+  1. Clique no card (em qualquer lugar exceto no ❤️)
+  2. Abre um modal (janela pop-up) com:
+     - Nome do fornecedor
+     - Descrição completa
+     - Instruções de acesso
+     - Link da página
+  3. Clique "Abrir Fornecedor" para acessar (abre em nova aba)
+  4. Clique "Fechar" ou X para fechar o modal
+
+G. FILTRAR POR FAVORITOS
+  1. Clique no botão "❤️ Favoritos" (topo direito)
+  2. Agora mostra apenas os fornecedores que você marcou
+  3. Clique novamente para ver todos
+
+H. FAZER LOGOUT
+  1. Clique no seu email (no canto superior direito)
+  2. Clique "Sair"
+  3. Você volta à página de login
+
+PRONTO! Agora você sabe usar o sistema! ✅
+
+================================================================================
+5. DEPLOY NETLIFY (15 MINUTOS)
+================================================================================
+
+A. PREPARAR O GIT
+
+PASSO 1: Faça um build local
+  $ npm run build
+  
+  (Deve criar pasta "dist" sem erros)
+
+PASSO 2: Inicialize Git (se não tiver)
+  $ git init
+  $ git add .
+  $ git commit -m "Projeto Portal Autopeças inicial"
+
+PASSO 3: Crie repositório no GitHub
+  → Vá para: https://github.com/new
+  → Nome: portal-autopeças
+  → Descrição: Sistema de fornecedores de autopeças
+  → Clique "Create Repository"
+
+PASSO 4: Conecte seu projeto local ao GitHub
+  $ git remote add origin https://github.com/seu-usuario/portal-autopeças.git
+  $ git branch -M main
+  $ git push -u origin main
+
+B. DEPLOY NO NETLIFY
+
+PASSO 1: Acesse Netlify
+  → Vá para: https://netlify.com
+  → Clique "Sign up" (com GitHub é mais rápido)
+  → Faça login
+
+PASSO 2: Conecte seu repositório
+  → Clique "New site from Git"
+  → Clique "GitHub"
+  → Selecione seu repositório "portal-autopeças"
+
+PASSO 3: Configure o build
+  → Base directory: (deixe vazio)
+  → Build command: npm run build
+  → Publish directory: dist
+  → Clique "Deploy"
+
+PASSO 4: Adicione variáveis de ambiente
+  → Aguarde o site Deploy (leva 2-3 minutos)
+  → Vá para "Site settings"
+  → Clique "Build & deploy"
+  → Clique "Environment"
+  → Clique "Edit variables"
+  → Adicione:
+      VITE_SUPABASE_URL = https://seu-projeto.supabase.co
+      VITE_SUPABASE_ANON_KEY = sua_chave_publica_aqui
+  → Salve
+
+PASSO 5: Dispare novo deploy
+  → Vá para "Deploys"
+  → Clique "Trigger deploy" (ou faça um git push)
+  → Aguarde 2-3 minutos
+  → Seu site está no ar! 🎉
+
+Seu site agora é acessível em:
+  https://seu-site.netlify.app
+
+C. ATUALIZAR SUPABASE AUTH CONFIG
+
+IMPORTANTE! Seu site não vai funcionar sem fazer isso:
+
+PASSO 1: Vá para Supabase
+  → Dashboard → Authentication → URL Configuration
+
+PASSO 2: Adicione sua URL
+  → Em "Site URL", adicione:
+      https://seu-site.netlify.app
+
+PRONTO! Agora o login funciona em produção! ✅
+
+================================================================================
+6. SOLUÇÃO DE PROBLEMAS
+================================================================================
+
+❌ ERRO: "Variáveis de ambiente não configuradas"
+   ✓ Solução: Crie arquivo .env.local com suas credenciais
+
+❌ ERRO: "Não consigo fazer login"
+   ✓ Solução: 
+     - Verifique se Email provider está ativado no Supabase
+     - Verifique se suas credenciais em .env.local estão corretas
+     - Limpe cookies do navegador (F12 → Application → Clear storage)
+
+❌ ERRO: "Tabelas não encontradas"
+   ✓ Solução: Execute novamente os scripts SQL no Supabase SQL Editor
+
+❌ ERRO: "Página em branco no Netlify"
+   ✓ Solução:
+     - Abra Console do navegador (F12)
+     - Procure por mensagens de erro em vermelho
+     - Verifique se variáveis de ambiente estão no Netlify
+     - Redeploye clicando "Trigger deploy"
+
+❌ ERRO: "Favoritos não salvam"
+   ✓ Solução:
+     - Verifique se você está logado
+     - Verifique RLS policies no Supabase
+     - Limpe cache do navegador (F12 → Application → Clear storage)
+
+❌ ERRO: "Link do fornecedor não funciona"
+   ✓ Solução: 
+     - Verifique se a URL está correta no banco de dados
+     - URL deve começar com https://
+
+❌ PROBLEMA: "Quero adicionar novo fornecedor"
+   ✓ Solução: Execute no SQL Editor do Supabase:
+
+      INSERT INTO fornecedores (nome, descricao, url, instrucoes, logo_url)
+      VALUES (
+        'Nome do Fornecedor',
+        'Descrição aqui',
+        'https://link.com',
+        'Instruções de login',
+        NULL
+      );
+
+      O fornecedor aparece automaticamente no Dashboard!
+
+❌ PROBLEMA: "Quero mudar as cores"
+   ✓ Solução: Edite arquivo src/index.css
+     
+     Procure por:
+       --primary: #2563eb;        ← Cor azul principal
+       --primary-dark: #1d4ed8;   ← Cor azul escuro
+       --secondary: #1f2937;      ← Cor cinza
+     
+     Altere para suas cores desejadas
+     Salve e o site atualiza automaticamente
+
+================================================================================
+RESUMO DOS COMANDOS PRINCIPAIS
+================================================================================
+
+DESENVOLVIMENTO:
+  $ npm run dev          → Inicia servidor local (http://localhost:5173)
+  $ npm run build        → Compila para produção
+  $ npm run preview      → Visualiza build localmente
+
+GIT:
+  $ git add .            → Adiciona todos os arquivos
+  $ git commit -m "msg"  → Faz commit
+  $ git push             → Envia para GitHub (dispara deploy automático)
+
+================================================================================
+ESTRUTURA DO PROJETO (RESUMIDA)
+================================================================================
+
+portal-autopeças/
+├── src/
+│   ├── components/          (Componentes React)
+│   │   ├── Navbar.jsx      (Barra superior)
+│   │   ├── SupplierCard.jsx (Card do fornecedor)
+│   │   └── SupplierModal.jsx (Modal de detalhes)
+│   ├── pages/              (Páginas)
+│   │   ├── Login.jsx       (Página de login)
+│   │   └── Dashboard.jsx   (Página principal)
+│   ├── services/           (Integração)
+│   │   └── supabaseClient.js (Conexão Supabase)
+│   ├── App.jsx             (Componente raiz)
+│   └── index.css           (Estilos globais)
+├── .env.local              (Variáveis de ambiente)
+├── package.json            (Dependências)
+└── netlify.toml            (Configuração deploy)
+
+================================================================================
+RECURSOS ÚTEIS
+================================================================================
+
+Supabase:        https://supabase.com
+React Docs:      https://react.dev
+Vite Docs:       https://vitejs.dev
+Netlify Docs:    https://docs.netlify.com
+Stack Overflow:  https://stackoverflow.com
+
+================================================================================
+DICAS IMPORTANTES
+================================================================================
+
+✅ NUNCA compartilhe seu .env.local com ninguém
+✅ NUNCA comita .env.local no Git
+✅ Use HTTPS em todas as URLs
+✅ Teste localmente antes de fazer deploy
+✅ Recarregue a página se algo estranho acontecer
+✅ Use F12 (DevTools) para debugging
+✅ Verifique Supabase Logs quando tiver dúvidas
+
+================================================================================
+PRÓXIMOS PASSOS
+================================================================================
+
+1. Rode o projeto localmente (npm run dev)
+2. Teste login/logout e favoritos
+3. Adicione mais fornecedores conforme necessário
+4. Customize cores em src/index.css
+5. Faça deploy no Netlify
+6. Compartilhe o link com sua equipe!
+
+================================================================================
+CONTATO & SUPORTE
+================================================================================
+
+Para problemas:
+  1. Verifique a seção "SOLUÇÃO DE PROBLEMAS" acima
+  2. Consulte documentação oficial do Supabase/React
+  3. Procure no Stack Overflow
+  4. Abra issue no GitHub
+
+================================================================================
+
+FIM DO TUTORIAL
+
+Versão: 1.0.0
+Data: 13 de Abril de 2026
+Status: ✅ COMPLETO E TESTADO
+
+Feito com ❤️ usando React + Supabase
+
+Happy Coding! 🚀
+
+================================================================================

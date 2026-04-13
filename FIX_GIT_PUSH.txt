@@ -1,0 +1,197 @@
+================================================================================
+                    SOLUÇÃO: GIT PUSH ERROR
+================================================================================
+
+ERRO RECEBIDO:
+  error: failed to push some refs to 'https://github.com/voltzgroups/portal-autopecas.git'
+
+CAUSA:
+  O repositório remoto tem arquivos que o seu local não tem (ou vice-versa)
+
+================================================================================
+SOLUÇÃO (PASSO A PASSO)
+================================================================================
+
+OPÇÃO 1: FORÇAR O PUSH (RECOMENDADO PARA PROJETO NOVO)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Se este é um projeto novo e você quer sobrescrever tudo:
+
+PASSO 1: Abra o terminal na pasta do projeto
+  $ cd C:\Users\Administrator\Downloads\plataformas\portal-autopeças
+
+PASSO 2: Adicione todos os arquivos
+  $ git add .
+
+PASSO 3: Faça um commit
+  $ git commit -m "Initial commit: Portal autopeças completo"
+
+PASSO 4: Faça um git pull para sincronizar
+  $ git pull origin main --allow-unrelated-histories
+
+  (Se pedir para fazer merge, pressione Ctrl+C e tente a próxima opção)
+
+PASSO 5: Force o push (sobrescreve o remoto)
+  $ git push -u origin main --force
+
+PRONTO! ✅
+
+================================================================================
+
+OPÇÃO 2: LIMPAR E COMEÇAR DO ZERO (MAIS SEGURO)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Se a Opção 1 não funcionar:
+
+PASSO 1: Remove o git local
+  $ cd C:\Users\Administrator\Downloads\plataformas\portal-autopeças
+  $ rm -r .git
+
+  (No Windows PowerShell, se não funcionar "rm", use:)
+  $ rmdir .git /s /q
+
+PASSO 2: Recrie o repositório
+  $ git init
+  $ git add .
+  $ git commit -m "Initial commit: Portal autopeças completo"
+  $ git branch -M main
+
+PASSO 3: Adicione o repositório remoto
+  $ git remote add origin https://github.com/voltzgroups/portal-autopecas.git
+
+PASSO 4: Force o push
+  $ git push -u origin main --force
+
+PRONTO! ✅
+
+================================================================================
+
+OPÇÃO 3: SE AINDA NÃO FUNCIONAR (NUCLEAR)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASSO 1: Delete o repositório no GitHub
+  → Vá para: https://github.com/voltzgroups/portal-autopecas
+  → Settings (no topo)
+  → Scroll para baixo até "Danger Zone"
+  → Clique "Delete this repository"
+  → Confirme digitando o nome do repositório
+
+PASSO 2: Crie um novo repositório
+  → Vá para: https://github.com/new
+  → Nome: portal-autopecas
+  → Descrição: Sistema de fornecedores de autopeças
+  → Clique "Create Repository"
+
+PASSO 3: Limpe o git local
+  $ cd C:\Users\Administrator\Downloads\plataformas\portal-autopeças
+  $ rmdir .git /s /q
+
+PASSO 4: Recrie do zero
+  $ git init
+  $ git add .
+  $ git commit -m "Initial commit: Portal autopeças completo"
+  $ git branch -M main
+  $ git remote add origin https://github.com/voltzgroups/portal-autopecas.git
+  $ git push -u origin main
+
+PRONTO! ✅
+
+================================================================================
+
+VERIFICAÇÃO RÁPIDA
+━━━━━━━━━━━━━━━━━━━
+
+Para verificar o status do seu repositório:
+
+  $ git status
+  
+  Deve mostrar: "On branch main, nothing to commit"
+
+Para ver o repositório remoto:
+
+  $ git remote -v
+  
+  Deve mostrar sua URL do GitHub
+
+Para ver o histórico de commits:
+
+  $ git log --oneline
+  
+  Deve mostrar seu último commit
+
+================================================================================
+
+PRÓXIMOS PASSOS
+━━━━━━━━━━━━━━
+
+Depois que o git push funcionar:
+
+1. Vá para GitHub e verifique que os arquivos foram enviados
+   https://github.com/voltzgroups/portal-autopecas
+
+2. No Netlify, reconecte o repositório:
+   → Site settings → Build & deploy → Connect to Git
+   → Selecione o repositório portal-autopecas
+   → Configure build settings
+   → Deploy
+
+3. Agora qualquer git push ativa deploy automático!
+   $ git push
+   (Seu site atualiza automaticamente em 2-3 minutos)
+
+================================================================================
+
+DICAS GIT IMPORTANTES
+━━━━━━━━━━━━━━━━━━━
+
+✅ Sempre commit antes de push:
+   $ git add .
+   $ git commit -m "descrição do que mudou"
+   $ git push
+
+✅ NUNCA comite .env.local (está no .gitignore):
+   $ git status
+   (não deve aparecer .env.local)
+
+✅ Se receber outro erro:
+   $ git pull origin main
+   $ git push -u origin main
+
+✅ Para ver o que será commitado:
+   $ git status
+
+✅ Para ver o histórico:
+   $ git log --oneline
+
+================================================================================
+
+ERRO COMUM: "fatal: unable to access"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Se aparecer: "fatal: unable to access 'https://github.com/...'"
+
+Significa que sua autenticação expirou ou está incorreta.
+
+SOLUÇÃO:
+1. No Windows PowerShell, remova a credencial armazenada:
+   $ git config --global --unset credential.helper
+
+2. Tente fazer push novamente:
+   $ git push -u origin main
+
+3. Ele pedirá seu usuário GitHub e uma senha
+   (Use um Personal Access Token: https://github.com/settings/tokens)
+
+================================================================================
+
+SUCESSO!
+━━━━━━━
+
+Se tudo funcionou, você deve ver:
+  "✓ successfully pushed"
+  ou
+  "Branch 'main' set up to track remote branch 'main'"
+
+Pronto! Seu código está no GitHub e Netlify pode fazer deploy! 🎉
+
+================================================================================
