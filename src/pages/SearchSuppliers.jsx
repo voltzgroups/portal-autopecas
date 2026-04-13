@@ -5,9 +5,10 @@ import {
   addSupplierToDatabase,
   checkSupplierExists
 } from '../services/searchService';
+import Navbar from '../components/Navbar';
 import './SearchSuppliers.css';
 
-export default function SearchSuppliers() {
+export default function SearchSuppliers({ user, onLogout, onNavigateDashboard, onNavigateSearch }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -95,6 +96,15 @@ export default function SearchSuppliers() {
 
   return (
     <div className="search-suppliers">
+      {/* Navbar */}
+      <Navbar
+        user={user}
+        onLogout={onLogout}
+        currentPage="search"
+        onNavigateSearch={onNavigateSearch}
+        onNavigateDashboard={onNavigateDashboard}
+      />
+
       {/* HEADER */}
       <div className="search-header">
         <h1>🔍 Buscar Fornecedores</h1>

@@ -14,4 +14,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Cria e exporta a instância do cliente Supabase
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Usa valores placeholder se as variáveis não estiverem configuradas para evitar crash no carregamento
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder'
+);
