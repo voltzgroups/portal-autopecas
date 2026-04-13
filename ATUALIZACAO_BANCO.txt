@@ -1,0 +1,77 @@
+================================================================================
+                    ATUALIZAÇÃO DO BANCO DE DADOS
+              Para suportar nova funcionalidade de busca avançada
+================================================================================
+
+PASSO 1: ADICIONAR COLUNA 'TAGS' À TABELA FORNECEDORES
+================================================================================
+
+Execute este comando no SQL Editor do Supabase:
+
+---INÍCIO DO CÓDIGO SQL---
+
+-- Adicionar coluna tags (se não existir)
+ALTER TABLE fornecedores
+ADD COLUMN IF NOT EXISTS tags VARCHAR(500);
+
+-- Criar índice para busca por tags
+CREATE INDEX IF NOT EXISTS idx_fornecedores_tags ON fornecedores(tags);
+
+---FIM DO CÓDIGO SQL---
+
+PRONTO! ✅ Agora a tabela suporta tags para categorizar fornecedores.
+
+================================================================================
+PASSO 2: (OPCIONAL) ADICIONAR TAGS AOS FORNECEDORES EXISTENTES
+================================================================================
+
+Se você quer adicionar categorias aos fornecedores já cadastrados:
+
+---INÍCIO DO CÓDIGO SQL---
+
+-- Atualizar Rufato
+UPDATE fornecedores
+SET tags = 'distribuidor,autopeças,b2b'
+WHERE nome = 'Rufato';
+
+-- Atualizar CHG Automotiva
+UPDATE fornecedores
+SET tags = 'loja,autopeças,b2b,peças automotivas'
+WHERE nome = 'CHG Automotiva';
+
+---FIM DO CÓDIGO SQL---
+
+PRONTO! ✅ Tags adicionadas aos fornecedores.
+
+================================================================================
+PASSO 3: CONFIGURAR VARIÁVEIS DE AMBIENTE (OPCIONAL)
+================================================================================
+
+Se você quer usar Brave Search API (opcional, pois DuckDuckGo é gratuito):
+
+1. Acesse: https://api.search.brave.com/
+2. Crie uma conta (pode ser free trial)
+3. Copie sua API key
+4. No arquivo .env.local, adicione:
+
+   VITE_BRAVE_API_KEY=sua_chave_aqui
+
+5. Se estiver usando Netlify, também configure lá:
+   Netlify → Site settings → Build & deploy → Environment → Add variable
+
+IMPORTANTE: O sistema funciona PERFEITAMENTE sem Brave!
+           DuckDuckGo é completamente gratuito e não requer API key.
+
+================================================================================
+PRONTO!
+================================================================================
+
+O banco de dados agora está pronto para usar a nova funcionalidade de busca.
+
+Para testar:
+1. Vá para a página "Buscar fornecedores"
+2. Digite algo (ex: "Rufato")
+3. Clique em "Buscar"
+4. Veja os resultados de múltiplas fontes!
+
+================================================================================

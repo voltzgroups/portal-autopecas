@@ -1,0 +1,415 @@
+================================================================================
+                   TUTORIAL: BUSCA AVANÇADA DE FORNECEDORES
+                        Sistema Portal Autopeças v2.0
+================================================================================
+
+📍 ÍNDICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. O QUE É A BUSCA AVANÇADA?
+2. COMO USAR
+3. CONFIGURAÇÃO
+4. COMO FUNCIONA (TÉCNICO)
+5. TROUBLESHOOTING
+6. EXEMPLOS DE USO
+
+================================================================================
+1. O QUE É A BUSCA AVANÇADA?
+================================================================================
+
+A busca avançada permite que você procure fornecedores em MÚLTIPLAS FONTES:
+
+✅ BANCO DE DADOS INTERNO (Supabase)
+   - Fornecedores que você já cadastrou
+   - Busca rápida e segura
+   - Acesso imediato
+
+✅ DUCKDUCKGO (Gratuito, sem API key)
+   - Motor de busca da web
+   - Encontra sites de fornecedores
+   - Sem custose sem limites
+
+✅ BRAVE SEARCH API (Opcional, com API key)
+   - Buscador privado e rápido
+   - Melhor precisão
+   - Requer registro (mas é gratuito com limite)
+
+RESULTADO: Um lugar único para encontrar fornecedores! 🎯
+
+================================================================================
+2. COMO USAR
+================================================================================
+
+PASSO 1: Acesse a página de busca
+  → Faça login no sistema
+  → Na navbar (barra superior), clique em "🔍 Buscar"
+  → Você está na página de busca avançada!
+
+PASSO 2: Digite o que você procura
+  → Digite um nome ou tipo de peça no campo de busca
+  → Exemplos:
+      "Rufato"
+      "Pneus"
+      "Óleo de motor"
+      "Filtro de ar"
+
+PASSO 3: Clique em "Buscar"
+  → O sistema vai procurar em todas as fontes
+  → Aguarde 2-3 segundos (está buscando na web!)
+  → Você verá resultados divididos em seções
+
+PASSO 4: Veja os resultados
+  
+  SEÇÃO 1: "📦 Fornecedores Cadastrados"
+    - Fornecedores que você já salvou
+    - Aparecem com badge "✓ Cadastrado"
+    - Clique "Acessar" para ir ao site
+  
+  SEÇÃO 2: "🌐 Resultados da Web"
+    - Fornecedores encontrados na internet
+    - Podem ser novos ou já conhecidos
+    - Você pode adicionar ao seu banco!
+
+PASSO 5: Adicione novos fornecedores (opcional)
+  → Viu um fornecedor interessante?
+  → Clique "Adicionar"
+  → O sistema salva automaticamente no banco
+  → Próxima vez que buscar, ele aparecerá em "Cadastrados"
+
+PRONTO! ✅
+
+================================================================================
+3. CONFIGURAÇÃO
+================================================================================
+
+A. CONFIGURAÇÃO BÁSICA (FUNCIONA JÁ)
+
+O sistema já funciona sem nenhuma configuração!
+
+DuckDuckGo é gratuito e sem limite.
+Você pode começar a usar AGORA!
+
+B. CONFIGURAÇÃO AVANÇADA (Brave Search - Opcional)
+
+Se quiser usar Brave Search (mais preciso):
+
+PASSO 1: Acesse https://api.search.brave.com/
+
+PASSO 2: Clique "Sign up for free"
+  → Crie uma conta
+  → Confirme seu email
+
+PASSO 3: Copie sua API Key
+  → No painel, você verá: "API Key"
+  → Clique para copiar
+
+PASSO 4: Adicione no arquivo .env.local (local)
+  
+  Abra o arquivo: .env.local
+  
+  Adicione esta linha:
+    VITE_BRAVE_API_KEY=sua_chave_aqui
+  
+  Exemplo:
+    VITE_BRAVE_API_KEY=sk-1234567890abcdef
+
+PASSO 5: Se estiver usando Netlify, também adicione lá
+  
+  → Painel Netlify
+  → Site settings → Build & deploy → Environment
+  → Clique "Edit variables"
+  → Adicione:
+      VITE_BRAVE_API_KEY = sua_chave_aqui
+  → Clique "Save"
+  → Clique "Trigger deploy"
+
+PRONTO! ✅ Brave Search ativado!
+
+C. ATUALIZAR BANCO DE DADOS (Recomendado)
+
+Para adicionar a coluna de "tags":
+
+PASSO 1: Vá para Supabase SQL Editor
+  → https://app.supabase.io
+  → Seu projeto
+  → SQL Editor
+
+PASSO 2: Execute este comando:
+
+---INÍCIO DO CÓDIGO SQL---
+
+ALTER TABLE fornecedores
+ADD COLUMN IF NOT EXISTS tags VARCHAR(500);
+
+CREATE INDEX IF NOT EXISTS idx_fornecedores_tags ON fornecedores(tags);
+
+---FIM DO CÓDIGO SQL---
+
+PASSO 3: Clique "Run"
+
+PRONTO! ✅ Banco atualizado!
+
+================================================================================
+4. COMO FUNCIONA (TÉCNICO)
+================================================================================
+
+ARQUITETURA:
+
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  Interface (SearchSuppliers.jsx)                           │
+│  ↓                                                          │
+│  Serviço de Busca (searchService.js)                       │
+│  ├─ searchLocalSuppliers()     → Busca no Supabase        │
+│  ├─ searchDuckDuckGo()        → Busca gratuita            │
+│  ├─ searchBrave()             → Busca opcional            │
+│  └─ searchAll()               → Combina tudo               │
+│  ↓                                                          │
+│  Múltiplas Fontes                                          │
+│  ├─ PostgreSQL (Supabase)                                  │
+│  ├─ API DuckDuckGo                                         │
+│  └─ API Brave Search                                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+FLUXO DE UMA BUSCA:
+
+1. Usuário digita "Rufato" e clica "Buscar"
+
+2. SearchSuppliers.jsx chama searchAll("Rufato")
+
+3. searchService.js executa em paralelo:
+   ├─ Busca local: SELECT * FROM fornecedores WHERE nome ILIKE %Rufato%
+   ├─ DuckDuckGo: GET https://api.duckduckgo.com/?q=Rufato+autopeças
+   └─ Brave: GET https://api.search.brave.com/...
+
+4. Resultados chegam:
+   ├─ Supabase: "Rufato" (1 resultado local)
+   ├─ DuckDuckGo: "Rufato Site", "Peças Rufato" (5 resultados)
+   └─ Brave: "Rufato Store", "Rufato Distribuidor" (5 resultados)
+
+5. Sistema combina e remove duplicados
+   → 5 resultados únicos
+
+6. Ordena:
+   ├─ Fornecedores locais primeiro (Rufato)
+   └─ Depois resultados da web
+
+7. Exibe na tela em 2 seções
+
+EXEMPLO DE RESPOSTA:
+
+[
+  {
+    id: "local-1",
+    title: "Rufato",
+    description: "Distribuidor de autopeças B2B",
+    url: "https://www.b2brufato.com.br",
+    source: "local",
+    tags: ["cadastrado"],
+    dbId: 1
+  },
+  {
+    id: "ddg-https://example1.com",
+    title: "Rufato Site Oficial",
+    description: "Compre peças automotivas online...",
+    url: "https://example1.com",
+    source: "duckduckgo",
+    tags: ["web"]
+  }
+]
+
+CACHE:
+
+O sistema NÃO faz cache entre buscas.
+Cada busca interroga as APIs novamente.
+
+Isso garante resultados sempre atualizados! ✅
+
+LIMITES:
+
+DuckDuckGo: Ilimitado (100 requisições por IP por dia é seguro)
+Brave: 300 requisições por mês (plano free)
+Supabase: Seu banco local (depende do plano)
+
+SEGURANÇA:
+
+✅ API Key do Brave NUNCA é exposta no frontend
+   → Fica em .env.local (não commitada)
+   → No Netlify, fica em variáveis secretas
+   → Usuários NUNCA veem a chave
+
+✅ Supabase tem RLS policies
+   → Apenas usuários autenticados buscam
+
+✅ DuckDuckGo é anônimo
+   → Sem rastreamento
+
+================================================================================
+5. TROUBLESHOOTING
+================================================================================
+
+❌ PROBLEMA: "Nenhum resultado encontrado"
+
+POSSIBILIDADES:
+  a) Digitou algo muito específico
+     → Tente palavras-chave mais gerais
+     → "Peças" em vez de "Peças suspensão traseira"
+  
+  b) Sem conexão com internet
+     → Verifique sua internet
+     → Teste com outro site
+  
+  c) APIs estão lentas
+     → Aguarde 5 segundos e tente novamente
+
+SOLUÇÃO:
+  → Tente buscas diferentes
+  → Verifique internet
+  → Recarregue a página (F5)
+
+---
+
+❌ PROBLEMA: "Brave Search não está funcionando"
+
+CAUSA: API Key não configurada
+
+SOLUÇÃO:
+  1. Verifique se adicionou em .env.local:
+     VITE_BRAVE_API_KEY=sua_chave
+  
+  2. Reinicie o servidor:
+     $ npm run dev
+  
+  3. Se em Netlify, verifique variáveis:
+     → Site settings → Environment
+     → VITE_BRAVE_API_KEY existe?
+  
+  4. Clique "Trigger deploy"
+
+IMPORTANTE: Brave é OPCIONAL!
+O sistema funciona perfeitamente só com DuckDuckGo! ✅
+
+---
+
+❌ PROBLEMA: "Não consigo adicionar fornecedor"
+
+POSSIBILIDADES:
+  a) Já está cadastrado
+     → Badge dirá "Já cadastrado"
+  
+  b) URL inválida
+     → Verificar se a URL é válida
+     → Deve começar com https://
+  
+  c) Sem permissão
+     → Fazer login
+     → Verificar RLS no Supabase
+
+SOLUÇÃO:
+  → Tente adicionar um fornecedor diferente
+  → Se o problema persistir, abra Console (F12) e veja o erro
+  → Procure o erro em TROUBLESHOOTING
+
+---
+
+❌ PROBLEMA: "Fornecedor aparece em 'Cadastrados' mas não em 'Web'"
+
+ESPERA! É NORMAL!
+
+Quando você adiciona um fornecedor:
+  1. Ele é salvo no Supabase
+  2. Aparece em "Cadastrados"
+  3. Próxima busca ele sai de "Web" (duplicado removido)
+  
+Isso é CORRETO! Sistema está funcionando! ✅
+
+================================================================================
+6. EXEMPLOS DE USO
+================================================================================
+
+EXEMPLO 1: Encontrar um fornecedor conhecido
+
+Você conhece "Rufato" mas não tem o site.
+
+1. Abra a página "🔍 Buscar"
+2. Digite: "Rufato"
+3. Clique "Buscar"
+4. Você verá:
+   - Se já cadastrado: "Rufato" em Cadastrados
+   - Se não cadastrado: "Rufato" em Resultados Web
+5. Clique "Acessar" para ir ao site
+
+PRONTO! ✅
+
+---
+
+EXEMPLO 2: Procurar por tipo de peça
+
+Você precisa de "Óleo de motor 5W40"
+
+1. Abra a página "🔍 Buscar"
+2. Digite: "Óleo 5W40"
+3. Clique "Buscar"
+4. Você verá fornecedores que vendem isso
+5. Clique "Adicionar" nos que interessam
+6. Próxima busca, aparecerão em "Cadastrados"
+
+PRONTO! ✅
+
+---
+
+EXEMPLO 3: Criar uma base de dados própria
+
+Objetivo: Ter todos seus fornecedores no sistema
+
+PROCESSO:
+1. Abra "🔍 Buscar"
+2. Busque cada fornecedor que você usa
+3. Clique "Adicionar" para adicionar ao banco
+4. Repita para todos os fornecedores
+5. Agora você tem tudo no Dashboard! 📦
+
+RESULTADO:
+→ Dashboard mostra todos seus fornecedores
+→ Você sabe exatamente onde cada um está
+→ Seus favoritos estão sincronizados
+→ Compartilhe com sua equipe! 🎯
+
+PRONTO! ✅
+
+================================================================================
+RESUMO
+================================================================================
+
+✅ BUSCA AVANÇADA = Procurar em múltiplas fontes
+✅ FUNCIONA AGORA = DuckDuckGo está já ativado
+✅ GRATUITO = Sem custos obrigatórios
+✅ OPCIONAL = Brave é complementar
+✅ SEGURO = API Keys nunca são expostas
+✅ RÁPIDO = Paralelo, combinado e deduplica
+
+USE AGORA! 🚀
+
+================================================================================
+SUPORTE
+================================================================================
+
+Se tiver dúvidas:
+
+1. Releia este tutorial
+2. Verifique TROUBLESHOOTING
+3. Abra F12 → Console
+4. Procure por erros em VERMELHO
+5. Copie o erro e procure no Google
+
+Boa sorte! 🎉
+
+================================================================================
+
+Versão: 2.0.0
+Data: 2026-04-13
+Status: ✅ PRONTO PARA USAR
+
+Feito com ❤️
+
+================================================================================

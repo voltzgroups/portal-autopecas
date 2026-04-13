@@ -9,7 +9,7 @@
 2. CONFIGURAÇÃO SUPABASE (10 minutos)
 3. RODAR LOCALMENTE (2 minutos)
 4. USAR O SISTEMA (5 minutos)
-5. DEPLOY NETLIFY (15 minutos)
+5. DEPLOY NETLIFY GRATUITO (15 minutos)
 6. SOLUÇÃO DE PROBLEMAS (consulta rápida)
 
 ================================================================================
@@ -207,8 +207,14 @@ H. FAZER LOGOUT
 PRONTO! Agora você sabe usar o sistema! ✅
 
 ================================================================================
-5. DEPLOY NETLIFY (15 MINUTOS)
+5. DEPLOY NETLIFY GRATUITO (15 MINUTOS) - SEM PAGAR DOMÍNIO
 ================================================================================
+
+ALTERNATIVA GRATUITA:
+  O Netlify oferece um domínio GRATUITO com extensão .netlify.app
+  Exemplo: seu-site.netlify.app
+  
+  Se quiser domínio próprio depois, você paga apenas o domínio (não o hosting)
 
 A. PREPARAR O GIT
 
@@ -217,105 +223,140 @@ PASSO 1: Faça um build local
   
   (Deve criar pasta "dist" sem erros)
 
-PASSO 2: Inicialize Git (se não tiver)
-  $ git init
-  $ git add .
-  $ git commit -m "Projeto Portal Autopeças inicial"
-
-PASSO 3: Crie repositório no GitHub
-  → Vá para: https://github.com/new
-  → Nome: portal-autopeças
-  → Descrição: Sistema de fornecedores de autopeças
-  → Clique "Create Repository"
-
-PASSO 4: Conecte seu projeto local ao GitHub
-  $ git remote add origin https://github.com/seu-usuario/portal-autopeças.git
-  $ git branch -M main
-  $ git push -u origin main
+PASSO 2: Você já tem o repositório no GitHub?
+  Sim → Continue para "B. DEPLOY NO NETLIFY"
 
 B. DEPLOY NO NETLIFY
 
 PASSO 1: Acesse Netlify
   → Vá para: https://netlify.com
   → Clique "Sign up" (com GitHub é mais rápido)
-  → Faça login
+  → Faça login com sua conta GitHub
 
 PASSO 2: Conecte seu repositório
   → Clique "New site from Git"
   → Clique "GitHub"
-  → Selecione seu repositório "portal-autopeças"
+  → Autorize o Netlify a acessar seus repositórios
+  → Selecione: "portal-autopecas"
 
 PASSO 3: Configure o build
   → Base directory: (deixe vazio)
   → Build command: npm run build
   → Publish directory: dist
   → Clique "Deploy"
+  
+  (Aguarde 2-3 minutos. O Netlify compilará seu código)
 
-PASSO 4: Adicione variáveis de ambiente
-  → Aguarde o site Deploy (leva 2-3 minutos)
+PASSO 4: Seu site agora tem um domínio GRATUITO!
+  
+  Você verá algo como:
+    ✅ Site live! https://algo-aleatorio.netlify.app
+  
+  ANOTE ESTE LINK! Este é seu site publicamente acessível!
+
+PASSO 5: Adicione variáveis de ambiente
+  → No painel do Netlify, clique no seu site
   → Vá para "Site settings"
   → Clique "Build & deploy"
   → Clique "Environment"
   → Clique "Edit variables"
   → Adicione:
-      VITE_SUPABASE_URL = https://seu-projeto.supabase.co
-      VITE_SUPABASE_ANON_KEY = sua_chave_publica_aqui
-  → Salve
+      Key: VITE_SUPABASE_URL
+      Value: https://seu-projeto.supabase.co
+      
+      Key: VITE_SUPABASE_ANON_KEY
+      Value: sua_chave_publica_aqui
+  → Clique "Save"
 
-PASSO 5: Dispare novo deploy
+PASSO 6: Dispare novo deploy
   → Vá para "Deploys"
-  → Clique "Trigger deploy" (ou faça um git push)
+  → Clique "Trigger deploy" → "Deploy site"
   → Aguarde 2-3 minutos
   → Seu site está no ar! 🎉
 
-Seu site agora é acessível em:
-  https://seu-site.netlify.app
+C. CONFIGURAR SUPABASE PARA O DOMÍNIO PUBLICO
 
-C. ATUALIZAR SUPABASE AUTH CONFIG
-
-IMPORTANTE! Seu site não vai funcionar sem fazer isso:
+IMPORTANTE! Seu login não funciona sem isso:
 
 PASSO 1: Vá para Supabase
   → Dashboard → Authentication → URL Configuration
 
-PASSO 2: Adicione sua URL
-  → Em "Site URL", adicione:
-      https://seu-site.netlify.app
+PASSO 2: Adicione sua URL do Netlify
+  → Em "Site URL", adicione seu domínio:
+      https://seu-dominio-aleatorio.netlify.app
+
+PASSO 3: Salve
 
 PRONTO! Agora o login funciona em produção! ✅
+
+D. COMPARTILHE SEU SITE (GRATUITO!)
+
+Seu site agora é acessível em:
+  https://seu-dominio-aleatorio.netlify.app
+
+Compartilhe com sua equipe! Ninguém precisa pagar nada! 🎉
+
+E. FUTURO: ADICIONAR DOMÍNIO PRÓPRIO (OPCIONAL)
+
+Se depois quiser um domínio bonito (tipo: autohub.com.br):
+
+1. Compre um domínio em:
+   → Hostinger (mais barato)
+   → GoDaddy
+   → Registro.br (para domínios .br)
+   
+   Custa: R$30-100 por ano
+
+2. Configure o domínio no Netlify:
+   → Site settings → Domain management
+   → Clique "Add a domain"
+   → Siga as instruções para apontar o DNS
+
+3. Pronto! Seu site está em seu domínio próprio!
+
+MAS TUDO FUNCIONA PERFEITAMENTE COM O DOMÍNIO .netlify.app GRATUITO!
 
 ================================================================================
 6. SOLUÇÃO DE PROBLEMAS
 ================================================================================
 
 ❌ ERRO: "Variáveis de ambiente não configuradas"
-   ✓ Solução: Crie arquivo .env.local com suas credenciais
-
-❌ ERRO: "Não consigo fazer login"
    ✓ Solução: 
-     - Verifique se Email provider está ativado no Supabase
-     - Verifique se suas credenciais em .env.local estão corretas
-     - Limpe cookies do navegador (F12 → Application → Clear storage)
+     - Verificar .env.local localmente
+     - Verificar variáveis no Netlify (Site settings → Environment)
+     - Fazer novo deploy após adicionar variáveis
+
+❌ ERRO: "Não consigo fazer login no site publicado"
+   ✓ Solução:
+     - Verificar se adicionou a URL do Netlify em Supabase Auth URL Configuration
+     - Limpar cookies do navegador
+     - Aguardar 5 minutos para propagação de DNS
+
+❌ ERRO: "Não consigo fazer login localmente"
+   ✓ Solução: 
+     - Verificar se Email provider está ativado no Supabase
+     - Verificar se suas credenciais em .env.local estão corretas
+     - Limpar cookies (F12 → Application → Clear storage)
 
 ❌ ERRO: "Tabelas não encontradas"
    ✓ Solução: Execute novamente os scripts SQL no Supabase SQL Editor
 
-❌ ERRO: "Página em branco no Netlify"
+❌ ERRO: "Página em branco no site publicado"
    ✓ Solução:
      - Abra Console do navegador (F12)
      - Procure por mensagens de erro em vermelho
      - Verifique se variáveis de ambiente estão no Netlify
-     - Redeploye clicando "Trigger deploy"
+     - Clique "Trigger deploy" para redeploiar
 
 ❌ ERRO: "Favoritos não salvam"
    ✓ Solução:
-     - Verifique se você está logado
-     - Verifique RLS policies no Supabase
-     - Limpe cache do navegador (F12 → Application → Clear storage)
+     - Verificar se está logado
+     - Limpar cache do navegador
+     - Redeploiar no Netlify
 
 ❌ ERRO: "Link do fornecedor não funciona"
    ✓ Solução: 
-     - Verifique se a URL está correta no banco de dados
+     - Verificar se a URL está correta no banco de dados
      - URL deve começar com https://
 
 ❌ PROBLEMA: "Quero adicionar novo fornecedor"
@@ -341,7 +382,7 @@ PRONTO! Agora o login funciona em produção! ✅
        --secondary: #1f2937;      ← Cor cinza
      
      Altere para suas cores desejadas
-     Salve e o site atualiza automaticamente
+     Salve e o site atualiza automaticamente após git push
 
 ================================================================================
 RESUMO DOS COMANDOS PRINCIPAIS
@@ -361,7 +402,7 @@ GIT:
 ESTRUTURA DO PROJETO (RESUMIDA)
 ================================================================================
 
-portal-autopeças/
+portal-autopecas/
 ├── src/
 │   ├── components/          (Componentes React)
 │   │   ├── Navbar.jsx      (Barra superior)
@@ -379,14 +420,40 @@ portal-autopeças/
 └── netlify.toml            (Configuração deploy)
 
 ================================================================================
-RECURSOS ÚTEIS
+RESUMO: HOSPEDAGEM 100% GRATUITA
 ================================================================================
 
-Supabase:        https://supabase.com
-React Docs:      https://react.dev
-Vite Docs:       https://vitejs.dev
-Netlify Docs:    https://docs.netlify.com
-Stack Overflow:  https://stackoverflow.com
+COMPONENTES USADOS:
+  ✅ Netlify (hosting) - GRATUITO
+  ✅ Supabase (banco de dados) - GRATUITO
+  ✅ GitHub (repositório) - GRATUITO
+  ✅ Domínio .netlify.app - GRATUITO
+
+CUSTO TOTAL: R$ 0,00
+
+CAPACIDADE:
+  • Até 500 requisições por mês (suficiente para empresa pequena)
+  • Banda ilimitada
+  • HTTPS incluído
+  • Deploy automático ao fazer git push
+  • Custom domain suportado (você paga só o domínio depois)
+
+QUANDO PRECISA PAGAR:
+  • Você quer um domínio próprio (tipo: autohub.com.br) → R$30-100/ano
+  • Você ultrapassa limite de requisições → aumenta plano do Supabase
+  • Você precisa de mais espaço em banco de dados → aumenta plano do Supabase
+
+================================================================================
+PRÓXIMOS PASSOS
+================================================================================
+
+1. Rode o projeto localmente (npm run dev)
+2. Teste login/logout e favoritos
+3. Adicione mais fornecedores conforme necessário
+4. Customize cores em src/index.css
+5. Faça deploy no Netlify (15 minutos)
+6. Copie o link .netlify.app e compartilhe com sua equipe!
+7. (Opcional) Depois compre um domínio próprio e aponte para Netlify
 
 ================================================================================
 DICAS IMPORTANTES
@@ -399,35 +466,27 @@ DICAS IMPORTANTES
 ✅ Recarregue a página se algo estranho acontecer
 ✅ Use F12 (DevTools) para debugging
 ✅ Verifique Supabase Logs quando tiver dúvidas
+✅ O domínio .netlify.app é tão profissional quanto qualquer outro!
 
 ================================================================================
-PRÓXIMOS PASSOS
+RECURSOS ÚTEIS
 ================================================================================
 
-1. Rode o projeto localmente (npm run dev)
-2. Teste login/logout e favoritos
-3. Adicione mais fornecedores conforme necessário
-4. Customize cores em src/index.css
-5. Faça deploy no Netlify
-6. Compartilhe o link com sua equipe!
-
-================================================================================
-CONTATO & SUPORTE
-================================================================================
-
-Para problemas:
-  1. Verifique a seção "SOLUÇÃO DE PROBLEMAS" acima
-  2. Consulte documentação oficial do Supabase/React
-  3. Procure no Stack Overflow
-  4. Abra issue no GitHub
+Supabase:        https://supabase.com
+Netlify:         https://netlify.com
+React Docs:      https://react.dev
+Vite Docs:       https://vitejs.dev
+GitHub:          https://github.com
+Stack Overflow:  https://stackoverflow.com
 
 ================================================================================
 
 FIM DO TUTORIAL
 
-Versão: 1.0.0
+Versão: 2.0.0 (Atualizado com hospedagem gratuita)
 Data: 13 de Abril de 2026
 Status: ✅ COMPLETO E TESTADO
+Custo: 100% GRATUITO
 
 Feito com ❤️ usando React + Supabase
 

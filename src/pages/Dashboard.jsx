@@ -11,7 +11,7 @@ import SupplierModal from '../components/SupplierModal';
 import Navbar from '../components/Navbar';
 import './Dashboard.css';
 
-export default function Dashboard({ user, onLogout }) {
+export default function Dashboard({ user, onLogout, onNavigateSearch }) {
   const [suppliers, setSuppliers] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,7 +118,13 @@ export default function Dashboard({ user, onLogout }) {
   return (
     <div className="dashboard-container">
       {/* Navbar */}
-      <Navbar user={user} onLogout={onLogout} />
+      <Navbar 
+        user={user} 
+        onLogout={onLogout}
+        currentPage="dashboard"
+        onNavigateSearch={onNavigateSearch}
+        onNavigateDashboard={() => {}}
+      />
 
       {/* Conteúdo Principal */}
       <main className="dashboard-main">
