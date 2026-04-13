@@ -67,13 +67,17 @@ export default function App() {
   return (
     <>
       {currentPage === 'dashboard' ? (
-        <Dashboard 
+        <Dashboard
+          user={user}
           onLogout={handleLogout}
           onNavigateSearch={() => setCurrentPage('search')}
         />
       ) : (
-        <SearchSuppliers 
+        <SearchSuppliers
+          user={user}
+          onLogout={handleLogout}
           onNavigateDashboard={() => setCurrentPage('dashboard')}
+          onNavigateSearch={() => setCurrentPage('search')}
         />
       )}
     </>
